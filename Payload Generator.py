@@ -1,14 +1,6 @@
 import os
-import platform
 import logging
 import subprocess
-import threading
-import sys
-import time
-
-# Set up the logging system
-logging.basicConfig(filename="payload_generator.log", level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
-log = logging.getLogger("payload_generator")
 
 # Function to create the "Payloads" folder if it doesn't exist
 def create_payloads_folder():
@@ -32,6 +24,20 @@ def generate_payload(ip, port, payload_type, android_api_level=None, bind=False,
     try:
         if not ip or not port:
             raise ValueError("IP address and port are required.")
+        
+        # Check if the IP is a valid IPv4 address
+        try:
+            socket.inet_aton(ip)
+        except socket.error:
+            raise ValueError("Invalid IP address. Please provide a valid IPv4 address.")
+
+        # Check if the port is a valid integer in the range [1, 65535]
+        try:
+            port = int(port)
+            if not (1 <= port <= 65535):
+                raise ValueError("Port number is out of range.")
+        except ValueError:
+            raise ValueError("Invalid port number. Please provide a valid integer in the range [1, 65535].")
 
         if payload_type not in ["android", "windows", "linux"]:
             raise ValueError("Unsupported payload type.")
@@ -80,6 +86,15 @@ def generate_payload(ip, port, payload_type, android_api_level=None, bind=False,
 if __name__ == "__main__":
     verbose = False  # Set this to False to suppress the animation and command execution messages
 
+    print("────────────────────────────────────────────────────")
+    print("     ██╗░░░░░░██╗██╗██╗░░░░░██╗░░░░░██╗░░░░░██╗███╗░░░██╗")
+    print("     ██║░░░░░░██║██║██║░░░░░██║░░░░░██║░░░░░██║████╗░██║")
+    print("     ██║░░░░░░██║██║██║░░░░░██║░░░░░██║░░░░░██║██╔██╗██║")
+    print("     ██║░░░░░░██║██║██║░░░░░██║░░░░░██║░░░░░██║██║╚████║")
+    print("     ███████╗░██║██║███████╗███████╗███████╗██║██║░╚███║")
+    print("     ╚══════╝░██║██║╚══════╝╚══════╝╚══════╝╚═╝╚═╝░░╚══╝")
+    print("────────────────────────────────────────────────────")
+    
     ip = input("Enter your IP address: ")
     port = input("Enter the port: ")
 
