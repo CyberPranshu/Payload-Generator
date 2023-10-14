@@ -8,7 +8,6 @@ from pyfiglet import Figlet
 
 # Constants for text formatting
 BOLD = "\033[1m"
-LARGE = "\033[4m"
 RESET = "\033[0m"
 
 # Create a custom Figlet font
@@ -117,7 +116,7 @@ def generate_payload(ip, port, payload_type, bind=False, bind_file=None, custom_
         if "Exception" in payload_output:
             raise Exception(f"Payload generation failed: {payload_output}")
 
-        success_message = f"{payload_type.capitalize()} payload generated successfully as '{output_file}'{' (and bound)' if bind else ''}"
+        success_message = f"Payload Generator: {payload_type.capitalize()} payload generated successfully as '{output_file}'{' (and bound)' if bind else ''}"
         log.info(success_message)
         return success_message
     except Exception as e:
@@ -127,25 +126,15 @@ def generate_payload(ip, port, payload_type, bind=False, bind_file=None, custom_
 if __name__ == "__main__":
     verbose = False  # Set this to False to suppress the animation and command execution messages
 
-    # Background color codes
-    BG_YELLOW = "\033[43m"
-    BG_RESET = "\033[0m"
-
-    print("\033[93m")
-    print(custom_figlet.renderText("Payload Generator"))
-    print("\033[0m")
-
     # Ask for IP address and port with colored background
-    ip = input(f"{BG_YELLOW}{BOLD}{LARGE}Enter your IP address: {RESET}")
-    port = input(f"{BG_YELLOW}{BOLD}{LARGE}Enter the port: {RESET}")
+    ip = input(f"{BOLD}Payload Generator: Enter your IP address: {RESET}")
+    port = input(f"{BOLD}Payload Generator: Enter the port: {RESET}")
 
-    print("\033[96m")
     print("Select payload type:")
     print("1. Android")
     print("2. Windows")
     print("3. Linux")
-    print("\033[0m")
-    choice = input(f"{BG_YELLOW}{BOLD}{LARGE}Enter the number of your choice: {RESET}")
+    choice = input(f"{BOLD}Payload Generator: Enter the number of your choice: {RESET}")
 
     if choice == "1":
         payload_type = "android"
@@ -154,17 +143,13 @@ if __name__ == "__main__":
     elif choice == "3":
         payload_type = "linux"
     else:
-        print("\033[91m")
-        print("Invalid choice. Please choose a valid payload type.")
-        print("\033[0m")
+        print("Payload Generator: Invalid choice. Please choose a valid payload type.")
         exit()
 
-    custom_filename = input(f"{BG_YELLOW}{BOLD}{LARGE}Enter a custom filename (leave empty to use default naming): {RESET}").strip()
+    custom_filename = input(f"{BOLD}Payload Generator: Enter a custom filename (leave empty to use default naming): {RESET}").strip()
 
-    bind = input(f"{BG_YELLOW}{BOLD}{LARGE}Do you want to bind payloads? (yes or no): {RESET}").strip().lower() == "yes"
-    bind_file = input(f"{BG_YELLOW}{BOLD}{LARGE}Enter the path to the file you want to bind (leave empty if not binding): {RESET}").strip()
+    bind = input(f"{BOLD}Payload Generator: Do you want to bind payloads? (yes or no): {RESET}").strip().lower() == "yes"
+    bind_file = input(f"{BOLD}Payload Generator: Enter the path to the file you want to bind (leave empty if not binding): {RESET}").strip()
 
     result = generate_payload(ip, port, payload_type, bind, bind_file, custom_filename, verbose=verbose)
-    print("\033[92m")
     print(result)
-    print("\033[0m")
