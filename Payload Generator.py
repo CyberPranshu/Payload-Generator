@@ -6,6 +6,11 @@ import time
 import socket
 from pyfiglet import Figlet
 
+# Constants for text formatting
+BOLD = "\033[1m"
+LARGE = "\033[4m"
+RESET = "\033[0m"
+
 # Create a custom Figlet font
 custom_figlet = Figlet(font="block")
 
@@ -15,7 +20,7 @@ log = logging.getLogger("payload_generator")
 
 # Function to create the "Payloads" folder if it doesn't exist
 def create_payloads_folder():
-    if not os.path.exists("Payloads"):
+    if not os.path exists("Payloads"):
         os.makedirs("Payloads")
 
 # Function to execute a command and capture the output
@@ -54,9 +59,6 @@ def generate_payload(ip, port, payload_type, android_api_level=None, bind=False,
             raise ValueError("Unsupported payload type.")
 
         if payload_type == "android":
-            if not android_api_level:
-                raise ValueError("Android API level is required for Android payloads.")
-
             if custom_filename and not custom_filename.endswith(".apk"):
                 raise ValueError("Invalid custom filename. Android payloads must have an '.apk' extension.")
 
@@ -134,10 +136,8 @@ if __name__ == "__main__":
     print("\033[0m")
 
     # Ask for IP address and port with colored background
-    print(f"{BG_YELLOW}Enter your IP address: {BG_RESET}", end=" ")
-    ip = input()
-    print(f"{BG_YELLOW}Enter the port: {BG_RESET}", end=" ")
-    port = input()
+    ip = input(f"{BG_YELLOW}{BOLD}{LARGE}Enter your IP address: {RESET}")
+    port = input(f"{BG_YELLOW}{BOLD}{LARGE}Enter the port: {RESET}")
 
     print("\033[96m")
     print("Select payload type:")
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     print("2. Windows")
     print("3. Linux")
     print("\033[0m")
-    choice = input("Enter the number of your choice: ")
+    choice = input(f"{BG_YELLOW}{BOLD}{LARGE}Enter the number of your choice: {RESET}")
 
     if choice == "1":
         payload_type = "android"
@@ -159,12 +159,10 @@ if __name__ == "__main__":
         print("\033[0m")
         exit()
 
-    android_api_level = input("Enter Android API level (e.g., 33 for Android 13, or leave empty for other platforms): ")
+    custom_filename = input(f"{BG_YELLOW}{BOLD}{LARGE}Enter a custom filename (leave empty to use default naming): {RESET}").strip()
 
-    custom_filename = input("Enter a custom filename (leave empty to use default naming): ").strip()
-
-    bind = input("Do you want to bind payloads? (yes or no): ").strip().lower() == "yes"
-    bind_file = input("Enter the path to the file you want to bind (leave empty if not binding): ").strip()
+    bind = input(f"{BG_YELLOW}{BOLD}{LARGE}Do you want to bind payloads? (yes or no): {RESET}").strip().lower() == "yes"
+    bind_file = input(f"{BG_YELLOW}{BOLD}{LARGE}Enter the path to the file you want to bind (leave empty if not binding): {RESET}").strip()
 
     result = generate_payload(ip, port, payload_type, android_api_level, bind, bind_file, custom_filename, verbose=verbose)
     print("\033[92m")
