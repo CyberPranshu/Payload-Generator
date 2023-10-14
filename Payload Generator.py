@@ -20,7 +20,7 @@ log = logging.getLogger("payload_generator")
 
 # Function to create the "Payloads" folder if it doesn't exist
 def create_payloads_folder():
-    if not os.path exists("Payloads"):
+    if not os.path.exists("Payloads"):
         os.makedirs("Payloads")
 
 # Function to execute a command and capture the output
@@ -36,7 +36,7 @@ def execute_command(command, verbose=False):
         return error_message
 
 # Function to generate payloads
-def generate_payload(ip, port, payload_type, android_api_level=None, bind=False, bind_file=None, custom_filename=None, verbose=False):
+def generate_payload(ip, port, payload_type, bind=False, bind_file=None, custom_filename=None, verbose=False):
     try:
         if not ip or not port:
             raise ValueError("IP address and port are required.")
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     bind = input(f"{BG_YELLOW}{BOLD}{LARGE}Do you want to bind payloads? (yes or no): {RESET}").strip().lower() == "yes"
     bind_file = input(f"{BG_YELLOW}{BOLD}{LARGE}Enter the path to the file you want to bind (leave empty if not binding): {RESET}").strip()
 
-    result = generate_payload(ip, port, payload_type, android_api_level, bind, bind_file, custom_filename, verbose=verbose)
+    result = generate_payload(ip, port, payload_type, bind, bind_file, custom_filename, verbose=verbose)
     print("\033[92m")
     print(result)
     print("\033[0m")
